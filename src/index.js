@@ -1,29 +1,44 @@
 import * as ReactDOM from "react-dom";
-import React, {Suspense} from "react";
+import React from "react";
 
-// 懒加载其他组件
-const OtherComponent = React.lazy(async () => {
-    import('./components/OtherComponent')
-        // .then(module => ({default: module.OtherComponent}))
-})
 
-console.log(OtherComponent);
+class ErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        // 控制是否降级显示ui的开关
+        this.state = {
+            hasError: true
+        }
+    }
 
-function MyComponent() {
+    static getDerivedStateFromError(error) {
+        return {hasError: true}
+    }
+
+    componentDidCatch(error, errorInfo) {
+        console.error(error, errorInfo)
+    }
+
+    render() {
+        if (this.state.hasError) {
+            /// 这是降级处理ui
+            return <h1>Something went wroing.</h1>
+        }
+
+        // 如果没有异常就返回应该显示的元素
+        return this.props.children
+    }
+}
+
+function App() {
     return (
-        <div>
-            {/* Suspense 支持一次性包裹多个懒加载组件*/}
-            <Suspense fallback={<div>loading....</div>}>
-                <section>
-                    <OtherComponent/>
-                </section>
-            </Suspense>
-        </div>
-
+        <ErrorBoundary>
+            <div>hahahah</div>
+        </ErrorBoundary>
     )
 }
 
 ReactDOM.render(
-    <MyComponent/>,
+    <App />,
     document.getElementById('root')
 )
