@@ -36,19 +36,79 @@ import * as ReactDOM from "react-dom";
 //     )
 // }
 
+/**
+ * 组件执行顺序： ReactDOM.render() -> 组件constructor() -> 组件render() ->
+ * 组件componentDidMoundt()
+ */
 class Clock extends React.Component {
+    constructor(props) {
+        // 将props传递到父类的构造函数中
+        super(props);
+        // 构造函数是唯一能给this.state赋值的地方
+        // 状态变量更新 依赖this.state 和 this.props，需要使用函数 ： (state, props) => {xxxx}
+        this.state = {
+            date: new Date()
+        }
+    }
+
+    // 组建已经挂载到DOM上
+    componentDidMount() {
+        // 添加不参与数据流（如this.props this.state）的额外字段
+        this.timerID = setInterval(
+            () => this.tick(),
+            1000
+        )
+    }
+
+    // 组建即将被移除
+    componentWillUnmount() {
+        clearInterval(this.timerID)
+    }
+
+    tick() {
+        this.setState({
+            date: new Date()
+        })
+    }
+
     render() {
         return (
             <div>
-                 <p>It's {this.props.date.toLocaleTimeString()}</p>
+                 <p>It's {this.state.date.toLocaleTimeString()}</p>
             </div>
+        )
+    }
+}
+
+
+// class类型组件事件绑定
+class Toggle extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isToggleOn: true
+        }
+
+    }
+
+    handleClick() {
+        this.setState({
+            isToggleOn: !this.state.isToggleOn
+        })
+    }
+
+    render() {
+        return (
+            <button onClick={() => this.handleClick()}>
+                {this.state.isToggleOn ? 'on' : 'off'}
+            </button>
         )
     }
 }
 
 function tick() {
     ReactDOM.render(
-        <Clock date={new Date()}/>,
+        <Toggle/>,
         document.getElementById('root')
     )
 }
