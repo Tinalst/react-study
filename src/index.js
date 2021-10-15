@@ -464,11 +464,75 @@ class Calculator extends React.Component {
     }
 }
 
+// 使用props.children 作为插槽
+function FancyBorder(props) {
+    return (
+        <div>
+            <p>FancyBorder</p>
+            {props.children}
+        </div>
+    )
+}
+
+function WelcomeDialog() {
+    return (
+        <FancyBorder>
+            {/* 中间的内容会作为children属性传入到FancyBorder组件中*/}
+            <h1>welcome</h1>
+            <p> Thank you for visiting our spacecraft! </p>
+        </FancyBorder>
+    )
+}
+
+
+// 自定义插槽的位置
+function Contacts() {
+    return (
+        <div>
+           contract
+        </div>
+    );
+}
+
+function Chat() {
+    return (
+        <div>
+            chat
+        </div>
+    )
+}
+
+function SplitPane(props) {
+    return (
+        <div>
+            <div>
+                {props.left}
+            </div>
+            <div>
+                {props.right}
+            </div>
+        </div>
+    )
+}
+
+function App() {
+    return (
+        // 注意这里的写法很特别
+        <SplitPane
+            left={
+                <Chat />
+            }
+            right={
+                <Contacts/>
+            }
+        />
+    )
+}
 
 
 function tick() {
     ReactDOM.render(
-        <Calculator />,
+        <App />,
         document.getElementById('root')
     )
 }
