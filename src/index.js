@@ -2,13 +2,21 @@ import React from "react";
 import * as ReactDOM from "react-dom";
 
 // 定义组件
-const FancyButton = React.forwardRef(((props, ref1) => {
+// const FancyButton = React.forwardRef(((props, ref1) => {
+//     return (
+//         <button ref={ref1}>
+//             {props.children}
+//         </button>
+//     )
+// }))
+
+const FancyButton = React.forwardRef(function myFunction (props, ref1) {
     return (
         <button ref={ref1}>
             {props.children}
         </button>
     )
-}))
+})
 
 // 1. 创建react.ref
 const ref = React.createRef();
