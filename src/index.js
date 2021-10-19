@@ -1,29 +1,44 @@
 import React from "react";
 import * as ReactDOM from "react-dom";
 
-// 定义组件
-// const FancyButton = React.forwardRef(((props, ref1) => {
-//     return (
-//         <button ref={ref1}>
-//             {props.children}
-//         </button>
-//     )
-// }))
+class CustomTextInput extends React.Component {
+    constructor(props) {
+        super(props);
 
-const FancyButton = React.forwardRef(function myFunction (props, ref1) {
-    return (
-        <button ref={ref1}>
-            {props.children}
-        </button>
-    )
-})
+        // ref 回调写法
+        this.setTextInputRef = el => {
+            this.textInput  = el
+        }
 
-// 1. 创建react.ref
-const ref = React.createRef();
+        this.focusTextInput = () => {
+            if(this.textInput) this.textInput.focus()
+        }
+    }
 
-//2. ref变量传递给组件
+
+    componentDidMount() {
+        this.focusTextInput();
+    }
+
+
+    render() {
+        return (
+            <div>
+                <input
+                    type={"text"}
+                    ref={this.setTextInputRef}
+                />
+                <input
+                    type={"button"}
+                    value={"click"}
+                    onClick={this.focusTextInput}
+                />
+            </div>
+        )
+    }
+}
+
 ReactDOM.render(
-    // 传递ref变量值给到组件的forwardRef参数
-    <FancyButton ref={ref}>click me</FancyButton>,
+    <CustomTextInput/>,
     document.getElementById('root')
 )
