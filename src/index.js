@@ -1,74 +1,53 @@
-import {Link, Switch, Route, useRouteMatch, BrowserRouter as Router} from "react-router-dom";
+import React from "react";
 import * as ReactDOM from "react-dom";
 
+class CustomTextInput extends React.Component {
+    constructor(props) {
+        super(props);
+        // 创建一个ref来存储textinput的dom元素
+        this.textInput = React.createRef()
+    }
 
-function App() {
-    return (
-        <Router>
+    focusTextInput() {
+        this.textInput.current.focus()
+    }
+
+    render() {
+        return (
             <div>
-                <ul>
-                    <li>
-                        <Link to={"/"}>Home</Link>
-                    </li>
-                    <li>
-                        <Link to={"/about"}>About</Link>
-                    </li>
-                    <li>
-                        <Link to={"/topics"}>Topics</Link>
-                    </li>
-                </ul>
-
-                {/*此处是路由的视图窗口，要写到div里*/}
-                <Switch>
-                    <Route path={"/about"}>
-                        <About/>
-                    </Route>
-                    <Route path={"/topics"}>
-                        <Topics />
-                    </Route>
-                    {/* 这个要放到最后，不然视图切换不起来！！！！！！*/}
-                    <Route path={"/"}>
-                        <Home/>
-                    </Route>
-                </Switch>
+                <input
+                    type={"text"}
+                    ref={this.textInput}/>
+                <input
+                    type={"button"}
+                    value={"click"}
+                    onClick={() => this.focusTextInput()}
+                />
             </div>
-        </Router>
-    )
+        )
+    }
 }
 
+class AutoFocusTextInput extends React.Component {
+    constructor(props) {
+        super(props);
+        // 创建来一个ref存储自定义组件元素
+        this.textInput = React.createRef();
+    }
 
-function Home() {
-    return <h2>Home</h2>
-}
+    componentDidMount() {
+        // 通过current下的可以直接调用ref存储的自定义元素的方法和变量
+        this.textInput.current.focusTextInput();
+    }
 
-function About() {
-    return <h2>About</h2>
-}
-
-function Topics() {
-    // let match = useRouteMatch()
-    // console.log(match);
-
-    return (
-        <div>
-            <h2>Topics</h2>
-            <ul>
-                <li>
-                    {/*<Link>Components</Link>*/}
-                </li>
-                <li>
-
-                </li>
-            </ul>
-        </div>
-
-        // <Switch>
-        //     <Route path={}></Route>
-        // </Switch>
-    )
+    render() {
+        return (
+            <CustomTextInput ref={this.textInput}/>
+        )
+    }
 }
 
 ReactDOM.render(
-    <App/>,
+    <AutoFocusTextInput/>,
     document.getElementById('root')
 )
