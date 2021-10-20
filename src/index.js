@@ -1,10 +1,15 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import * as ReactDOM from "react-dom";
 
 function Example() {
     // 声明一个count的state变量，以及修改count的方法
     // count 初始变量为 0
     const [count, setCount] = useState(0);
+
+    // 相当于componentDidMount 和componentDidUpdate
+    useEffect(() => {
+        console.log(count)
+    })
 
     return (
         <div>
