@@ -1,47 +1,90 @@
-import {BrowserRouter as Router,
+import {
+    BrowserRouter as Router,
     Switch,
-    Route,
-    Link,
-    useParams
-} from 'react-router-dom'
+    Route, Link,
+    useParams,
+    useRouteMatch
+} from "react-router-dom"
 
-export default function BasicExample() {
+
+function Home() {
     return (
-        <Router>
-            <div>
-                <h2>account</h2>
-                <ul>
-                    <li>
-                        <Link to={"/netflix"}>Netflix</Link>
-                    </li>
-                    <li>
-                        <Link to={"/zillow-group"}>zillow-group</Link>
-                    </li>
-                    <li>
-                        <Link to={"/yahoo"}>Yahoo</Link>
-                    </li>
-                    <li>
-                        <Link to={"/modus-create"}>Modus Create</Link>
-                    </li>
-                </ul>
-            </div>
-
-
-        {/*    2. 定义路由表*/}
-            <Switch>
-                <Route path={"/:id"} children={<Child/>} />
-            </Switch>
-        </Router>
+        <div>
+            <h2>HOME</h2>
+        </div>
     )
 }
 
-// 1/ 定义路由组件
-function Child() {
-    let {id} = useParams();
+function Topics() {
+    // path - 相对父路由的path
+    // url - 相对路径url
+    let {path, url} = useRouteMatch()
+    console.log('path', path);
+    console.log('url', url);
 
     return (
         <div>
-            <p>ID: {id}</p>
+            <h2>Topics</h2>
+           <ul>
+               <li>
+                   <Link to={`${url}/rending`}>Rendering with React</Link>
+               </li>
+               <li>
+                   <Link to={`${url}/components`}>Components</Link>
+               </li>
+               <li>
+                   <Link to={`${url}/props-v-state`}>Props v. State</Link>
+               </li>
+           </ul>
+
+
+            <Switch>
+                <Route exact path={path}>
+                    <h3>nesting ctx</h3>
+                </Route>
+
+                <Route path={`${path}/:topicId`}>
+                    <Topic/>
+                </Route>
+            </Switch>
         </div>
+    )
+}
+
+function Topic() {
+    // :/id/:topicId
+    let {topicId} = useParams();
+
+    return (
+        <div>
+            <h3>{topicId}</h3>
+        </div>
+    )
+}
+
+export default function NestingExample() {
+    return (
+        <Router>
+            <div>
+                <li>
+                    <Link to={"/home"}> Home </Link>
+                </li>
+                <li>
+                    <Link to={"/topics"}> Topics </Link>
+                </li>
+            </div>
+
+            {/*    1/ 定义路由表*/}
+            <Switch>
+                {/*exact 严格匹配???*/}
+                <Route exact path={"/"}>
+                    <Home/>
+                </Route>
+
+                <Route path={"/topics"}>
+                    <Topics/>
+                </Route>
+            </Switch>
+        </Router>
     )
 }
