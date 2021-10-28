@@ -1,62 +1,47 @@
-import {BrowserRouter as Router, Switch, Route, Link} from 'react-router-dom'
+import {BrowserRouter as Router,
+    Switch,
+    Route,
+    Link,
+    useParams
+} from 'react-router-dom'
 
 export default function BasicExample() {
     return (
         <Router>
-            {/* 2. 定义路由跳转页面*/}
             <div>
+                <h2>account</h2>
                 <ul>
                     <li>
-                        <Link to={"/"}>Home</Link>
+                        <Link to={"/netflix"}>Netflix</Link>
                     </li>
                     <li>
-                        <Link to={"/about"}>About</Link>
+                        <Link to={"/zillow-group"}>zillow-group</Link>
                     </li>
                     <li>
-                        <Link to={"/dashboard"}>Dashboard</Link>
+                        <Link to={"/yahoo"}>Yahoo</Link>
+                    </li>
+                    <li>
+                        <Link to={"/modus-create"}>Modus Create</Link>
                     </li>
                 </ul>
             </div>
 
-            {/*定义路由表*/}
+
+        {/*    2. 定义路由表*/}
             <Switch>
-                <Route exact path={"/"}>
-                    <Home/>
-                </Route>
-
-                <Route path={"/about"}>
-                    <About/>
-                </Route>
-
-                <Route path={"/dashboard"}>
-                    <Dashboard/>
-                </Route>
+                <Route path={"/:id"} children={<Child/>} />
             </Switch>
         </Router>
     )
 }
 
 // 1/ 定义路由组件
-function Home() {
-    return (
-        <div>
-            <h2>Home</h2>
-        </div>
-    )
-}
+function Child() {
+    let {id} = useParams();
 
-function About() {
     return (
         <div>
-            <h2>About</h2>
-        </div>
-    )
-}
-
-function Dashboard() {
-    return (
-        <div>
-            <h2>Dashboard</h2>
+            <p>ID: {id}</p>
         </div>
     )
 }
