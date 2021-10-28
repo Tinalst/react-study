@@ -1,90 +1,192 @@
+import React, { useContext, createContext, useState } from "react";
 import {
     BrowserRouter as Router,
     Switch,
-    Route, Link,
-    useParams,
-    useRouteMatch
-} from "react-router-dom"
+    Route,
+    Link,
+    Redirect,
+    useHistory,
+    useLocation
+} from "react-router-dom";
 
+// This example has 3 pages: a public page, a protected
+// page, and a login screen. In order to see the protected
+// page, you must first login. Pretty standard stuff.
+//
+// First, visit the public page. Then, visit the protected
+// page. You're not yet logged in, so you are redirected
+// to the login page. After you login, you are redirected
+// back to the protected page.
+//
+// Notice the URL change each time. If you click the back
+// button at this point, would you expect to go back to the
+// login page? No! You're already logged in. Try it out,
+// and you'll see you go back to the page you visited
+// just *before* logging in, the public page.
 
-function Home() {
+export default function AuthExample() {
     return (
-        <div>
-            <h2>HOME</h2>
-        </div>
-    )
+        <ProvideAuth>
+            <Router>
+                <div>
+                    <AuthButton />
+
+                    <ul>
+                        <li>
+                            <Link to="/public">Public Page</Link>
+                        </li>
+                        <li>
+                            <Link to="/protected">Protected Page</Link>
+                        </li>
+                    </ul>
+
+                    <Switch>
+                        <Route path="/public">
+                            <PublicPage />
+                        </Route>
+                        <Route path="/login">
+                            <LoginPage />
+                        </Route>
+                        {/*// 自定义一个路由组件*/}
+                        <PrivateRoute path="/protected">
+                            <ProtectedPage />
+                        </PrivateRoute>
+                    </Switch>
+                </div>
+            </Router>
+        </ProvideAuth>
+    );
 }
 
-function Topics() {
-    // path - 相对父路由的path
-    // url - 相对路径url
-    let {path, url} = useRouteMatch()
-    console.log('path', path);
-    console.log('url', url);
+const fakeAuth = {
+    isAuthenticated: false,
+    signin(cb) {
+        fakeAuth.isAuthenticated = true;
+        setTimeout(cb, 100); // fake async
+    },
+    signout(cb) {
+        fakeAuth.isAuthenticated = false;
+        setTimeout(cb, 100);
+    }
+};
+
+/** For more details on
+ * `authContext`, `ProvideAuth`, `useAuth` and `useProvideAuth`
+ * refer to: https://usehooks.com/useAuth/
+ */
+const authContext = createContext();
+
+function ProvideAuth({ children }) {
+    const auth = useProvideAuth();
+    return (
+        <authContext.Provider value={auth}>
+            {children}
+        </authContext.Provider>
+    );
+}
+
+function useAuth() {
+    // authContext 是一个定义的共享上下文
+    return useContext(authContext);
+}
+
+function useProvideAuth() {
+    const [user, setUser] = useState(null);
+
+    const signin = cb => {
+        return fakeAuth.signin(() => {
+            setUser("user");
+            cb();
+        });
+    };
+
+    const signout = cb => {
+        return fakeAuth.signout(() => {
+            setUser(null);
+            cb();
+        });
+    };
+
+    return {
+        user,
+        signin,
+        signout
+    };
+}
+
+function AuthButton() {
+    let history = useHistory();
+    // auth可以获得到  authContext 共享的上下文的内容
+    let auth = useAuth();
+
+    return auth.user ? (
+        <p>
+            Welcome!{" "}
+            <button
+                onClick={() => {
+                    auth.signout(() => history.push("/"));
+                }}
+            >
+                Sign out
+            </button>
+        </p>
+    ) : (
+        <p>You are not logged in.</p>
+    );
+}
+
+// A wrapper for <Route> that redirects to the login
+// screen if you're not yet authenticated.
+// 自定一的路由组件 返回<Route>
+function PrivateRoute({ children, ...rest }) {
+    // auth 可以获取到 authContext共享出来的上下文
+    let auth = useAuth();
+    return (
+        <Route
+            {...rest}
+            render={({ location }) =>
+                auth.user ? (
+                    children
+                ) : (
+                    <Redirect
+                        to={{
+                            pathname: "/login",
+                            state: { from: location }
+                        }}
+                    />
+                )
+            }
+        />
+    );
+}
+
+function PublicPage() {
+    return <h3>Public</h3>;
+}
+
+function ProtectedPage() {
+    return <h3>Protected</h3>;
+}
+
+function LoginPage() {
+    let history = useHistory();
+    let location = useLocation();
+    let auth = useAuth();
+
+    console.log(history.location, auth);
+    //
+    let { from } = location.state || { from: { pathname: "/" } };
+    let login = () => {
+
+        auth.signin(() => {
+            history.replace(from);
+        });
+    };
 
     return (
         <div>
-            <h2>Topics</h2>
-           <ul>
-               <li>
-                   <Link to={`${url}/rending`}>Rendering with React</Link>
-               </li>
-               <li>
-                   <Link to={`${url}/components`}>Components</Link>
-               </li>
-               <li>
-                   <Link to={`${url}/props-v-state`}>Props v. State</Link>
-               </li>
-           </ul>
-
-
-            <Switch>
-                <Route exact path={path}>
-                    <h3>nesting ctx</h3>
-                </Route>
-
-                <Route path={`${path}/:topicId`}>
-                    <Topic/>
-                </Route>
-            </Switch>
+            <p>You must log in to view the page at {from.pathname}</p>
+            <button onClick={login}>Log in</button>
         </div>
-    )
-}
-
-function Topic() {
-    // :/id/:topicId
-    let {topicId} = useParams();
-
-    return (
-        <div>
-            <h3>{topicId}</h3>
-        </div>
-    )
-}
-
-export default function NestingExample() {
-    return (
-        <Router>
-            <div>
-                <li>
-                    <Link to={"/home"}> Home </Link>
-                </li>
-                <li>
-                    <Link to={"/topics"}> Topics </Link>
-                </li>
-            </div>
-
-            {/*    1/ 定义路由表*/}
-            <Switch>
-                {/*exact 严格匹配???*/}
-                <Route exact path={"/"}>
-                    <Home/>
-                </Route>
-
-                <Route path={"/topics"}>
-                    <Topics/>
-                </Route>
-            </Switch>
-        </Router>
-    )
+    );
 }
