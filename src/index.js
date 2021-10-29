@@ -27,6 +27,7 @@ const TimerView = observer(
     }
 )
 
+// 可被观察对象timer通过组件的props属性传入
 ReactDOM.render(
     <TimerView timer={timer}/>,
     document.getElementById('root')
