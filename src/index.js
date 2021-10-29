@@ -18,7 +18,7 @@ class Timer {
 const timer = new Timer();
 
 const TimerView = observer(
-    ({timer}) => {
+    () => {
         return (
             <span>
                 seconds passed: {timer.secondsPassed}
@@ -29,7 +29,7 @@ const TimerView = observer(
 
 // 可被观察对象timer通过组件的props属性传入
 ReactDOM.render(
-    <TimerView timer={timer}/>,
+    <TimerView/>,
     document.getElementById('root')
 )
 
